@@ -4,8 +4,8 @@ A complete engine for **Taikyoku Shogi** (大局将棋, "ultimate chess"), the l
 
 - **36 x 36** board (1,296 squares)
 - **804 pieces** (402 per side)
-- **209 piece types** with distinct movement patterns
-- **92 additional promoted forms**
+- **209 initial piece types** with distinct movement patterns
+- **92 additional promoted forms** (301 movement classes in total)
 
 ## Rules Overview
 
@@ -163,7 +163,16 @@ taikyokushogi-engine/
     movegen.rs          # Legal move generation
     attack.rs           # Attack / ray bitboards
     bitboard.rs         # Bitboard helpers
-    search.rs           # PVS + TT + move ordering + pruning + quiescence + Lazy SMP
+    search/              # PVS + TT + move ordering + pruning + quiescence + Lazy SMP
+      mod.rs             #   Entry point: iterative deepening + aspiration windows
+      params.rs          #   Every tunable constant in one place
+      pvs.rs             #   PVS core (pruning stages, staged movegen, beams)
+      root.rs            #   Root iteration + depth-1..3 fast path (opt-in)
+      qsearch.rs         #   Capture-only quiescence
+      tt.rs              #   Lock-free bucketed transposition table
+      heuristics.rs      #   Killers / butterfly history / counter moves
+      ordering.rs        #   Move scoring
+      tests: tests/      # Correctness suite (cargo test)
     tsfen.rs            # TSFEN position notation (encode / parse)
     eval/
       mod.rs            # Evaluator dispatcher (hand-crafted <-> NNUE)
@@ -173,6 +182,7 @@ taikyokushogi-engine/
       nnue.rs           # NNUE (HalfKP-style) neural evaluator + .nnue loader
     debugging/          # Search/eval introspection utilities
   examples/             # Benchmarks, smoke tests and tooling (see above)
+  tests/                # Integration correctness suite (cargo test)
   web/                  # TypeScript + Vite frontend (served by the Rust server)
     src/
       main.ts           #   Entry point
@@ -189,25 +199,42 @@ taikyokushogi-engine/
 ## Performance
 
 Measured on the development machine with the release-mode benchmarks
-(`cargo run --release --example bench_nps` and `--example bench_fixed`).
+(`cargo run --release --example bench_nps` and `--example bench_fixed`). The CPU I used is a Xeon E3 1230 V2
 
 | Metric | Value |
 |---|---|
 | Legal moves from the initial position | 512 |
-| Move generation (`legal_moves`) | ~0.73 ms |
-| Static evaluation (`evaluate`) | ~51 µs |
-| `apply` + `undo` round trip | ~49 µs |
-| Perft(2) | 260,975 nodes @ ~1.09 M nodes/s |
-| Fixed-depth search — depth 4 | ~0.57 s (~175 k nodes/s) |
-| Fixed-depth search — depth 5 | ~1.4 s (~195 k nodes/s) |
-| Fixed-depth search — depth 6 | ~2.4 s (~205 k nodes/s) |
+| Move generation (`legal_moves`) | ~70 µs |
+| Static evaluation (`evaluate`) | ~50 µs |
+| `apply` + `undo` round trip | ~55 µs |
+| Perft(2) | 260,908 nodes @ ~20 M nodes/s |
+| Search — depth 1 | ~13 ms |
+| Search — depth 2 | ~190 ms |
+| Search — depth 3 | ~160 ms |
+| Search — depth 4 | ~2.7 s (~450 k nodes/s) |
 
-The search (`src/search.rs`) uses iterative deepening with aspiration
+Every depth runs a real alpha-beta search (an old depth≤3 material-delta
+shortcut that made shallow depths equivalent to depth 1 is now disabled by
+default — see `search::params::MATERIAL_FAST_PATH_MAX_DEPTH`).
+
+The search (`src/search/`) uses iterative deepening with aspiration
 windows, principal-variation search (PVS), a transposition table with
 lock-free concurrent access, killer / counter / history move ordering,
 null-move pruning, razoring / reverse-futility / futility / ProbCut
 pruning, staged move generation and quiescence search. At depth ≥ 4,
 Lazy SMP parallelism spawns up to 3 helper threads.
+
+### Strength testing
+
+```bash
+cargo run --release --example match_race -- 20 3 2 5000 4   # depth 3 vs depth 2, 20 games
+```
+
+Head-to-head matches between any two search configurations (depths, time
+budgets, handcrafted vs NNUE via the eval toggle) with alternating colors
+and deterministic opening randomization. For publishable Elo claims, run
+>= 1000 games and compute a confidence interval or SPRT bounds on the
+W/L/D counts.
 
 ## Neural Evaluation (NNUE)
 

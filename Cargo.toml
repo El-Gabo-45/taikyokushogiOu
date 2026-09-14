@@ -2,9 +2,9 @@
 name = "taikyokushogi"
 version = "0.1.0"
 edition = "2021"
-description = "Taikyoku Shogi engine — the largest known shogi variant (36x36 board, 804 pieces, 209 piece types)"
+description = "Taikyoku Shogi engine — the largest known shogi variant (36x36 board, 804 pieces, 209 initial piece types / 301 movement classes)"
 license = "MIT"
-repository = "https://github.com/jh85/taikyokushogi"
+repository = "https://github.com/El-Gabo-45/taikyokushogi-engine"
 readme = "README.md"
 keywords = ["shogi", "taikyoku", "board-game", "chess-variant", "game-engine"]
 categories = ["games", "game-engines"]
