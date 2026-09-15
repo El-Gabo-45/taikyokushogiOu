@@ -72,7 +72,7 @@ Each side's 402 pieces occupy 12 ranks. Black occupies the bottom of the board (
 ### Build
 
 ```bash
-git clone https://github.com/jh85/taikyokushogi.git
+git clone https://github.com/El-Gabo-45/taikyokushogi-engine.git
 cd taikyokushogi
 
 # Build the engine, server, CLI tools and examples in release mode
