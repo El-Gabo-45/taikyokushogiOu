@@ -7,6 +7,13 @@
 
 use crate::eval::MATE_SCORE;
 
+// ── Root material fast path (DISABLED — kept as an opt-in hack) ──
+// 0 = disabled: every depth runs the real alpha-beta root. This path scored
+// root moves by material delta only (no opponent replies), making depth 2/3
+// equivalent to depth 1; any strength test with it enabled is invalid.
+// Set to >0 ONLY for movegen/apply micro-benchmarks.
+pub const MATERIAL_FAST_PATH_MAX_DEPTH: u32 = 0;
+
 // ── Move-ordering score ladder ──────────────────────────────────
 // Priority: TT move > root hint > tactical (MVV-LVA) > killers > history+counter.
 pub const ROOT_HINT_SCORE: i32 = 3_000_000; // previous-iteration best-move bonus

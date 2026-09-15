@@ -35,8 +35,13 @@ pub(crate) fn search_root_window(
         return super::SearchResult { best_move: None, score: evaluate(board), nodes: 1, time_ms: 0 };
     }
 
-    // Depth 1-3 all use the fast material-delta path (see `material_delta_root`).
-    if depth <= 3 {
+    // NOTE: depth 1-3 used to take a "material-delta fast path" that scored
+    // each root move by its material change only (no opponent replies). That
+    // made "depth 2/3" equivalent to depth 1 and silently invalidated any
+    // strength comparison across depths. It is now DISABLED by default and
+    // every depth runs the real alpha-beta root below. Re-enable only for
+    // movegen/apply micro-benchmarks, never for strength measurements.
+    if depth <= params::MATERIAL_FAST_PATH_MAX_DEPTH {
         return material_delta_root(board, depth, start);
     }
 

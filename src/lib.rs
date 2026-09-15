@@ -45,6 +45,12 @@ mod movegen;
 mod attack;
 mod eval;
 pub mod search;
+
+/// Centralized correctness suite (runs with `cargo test`). Lives inside the
+/// crate because the release profile uses `panic = "abort"`, which external
+/// integration tests in `tests/` cannot link against.
+#[cfg(test)]
+mod correctness_tests;
 mod tsfen;
 mod bitboard;
 mod debugging;

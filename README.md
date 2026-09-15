@@ -172,7 +172,7 @@ taikyokushogi-engine/
       tt.rs              #   Lock-free bucketed transposition table
       heuristics.rs      #   Killers / butterfly history / counter moves
       ordering.rs        #   Move scoring
-      tests: tests/      # Correctness suite (cargo test)
+    correctness_tests.rs #   Correctness suite (cargo test; internal due to panic=abort)
     tsfen.rs            # TSFEN position notation (encode / parse)
     eval/
       mod.rs            # Evaluator dispatcher (hand-crafted <-> NNUE)
