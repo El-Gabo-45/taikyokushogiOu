@@ -72,7 +72,7 @@ Each side's 402 pieces occupy 12 ranks. Black occupies the bottom of the board (
 ### Build
 
 ```bash
-git clone https://github.com/El-Gabo-45/taikyokushogi-engine.git
+git clone https://github.com/El-Gabo-45/taikyokushogiOu.git
 cd taikyokushogi
 
 # Build the engine, server, CLI tools and examples in release mode
@@ -150,7 +150,7 @@ cargo run --release --example bench_nps           # full benchmark report
 ## Project Structure
 
 ```
-taikyokushogi-engine/
+taikyokushogiOu/
   src/
     lib.rs              # Public crate API (Board, Move, PieceInfo, search, TSFEN, ...)
     main.rs             # HTTP server + REST API + static web GUI   (bin: taikyokushogi-server)
