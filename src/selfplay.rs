@@ -1,7 +1,6 @@
 //! GPU-accelerated self-play for Taikyoku Shogi.
 use crate::types::*;
 use crate::board::Board;
-use crate::movegen::generate_legal_moves;
 use crate::search::search;
 
 use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
@@ -134,7 +133,7 @@ impl SelfPlayWorker {
         let mut move_count = 0u32;
         let mut game_samples: Vec<TrainingSample> = Vec::new();
         let mut game_moves: Vec<GameMove> = Vec::new();
-        let mut result_val: i8 = 0;
+        let result_val: i8;
 
         loop {
             let terminal = board.game_result();
@@ -365,7 +364,7 @@ impl SelfPlayCoordinator {
             Ok(c) => c,
             Err(e) => { eprintln!("[db] open failed: {}", e); return; }
         };
-        if let Err(e) = conn.execute_batch(
+        if let Err(_e) = conn.execute_batch(
             "CREATE TABLE IF NOT EXISTS games (
                 id INTEGER PRIMARY KEY,
                 result INTEGER NOT NULL,

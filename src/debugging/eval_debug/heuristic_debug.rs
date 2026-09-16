@@ -1,3 +1,4 @@
+#![allow(dead_code)] // utility/debug API kept intentionally
 use crate::board::Board;
 use crate::eval::families::family_value;
 use crate::eval::zones::zone_score;

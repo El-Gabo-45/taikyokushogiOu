@@ -1,6 +1,7 @@
+#![allow(dead_code)] // precomputed-table / debug utilities kept intentionally
 use crate::board::Board;
 use crate::eval::evaluate;
-use crate::types::{BLACK, WHITE};
+use crate::types::BLACK;
 
 /// Snapshot útil para trazar una llamada de alpha-beta.
 #[derive(Debug, Clone)]

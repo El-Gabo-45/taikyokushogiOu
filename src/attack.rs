@@ -144,7 +144,7 @@ pub fn generate_captures_bb(board: &Board) -> (Vec<crate::types::Move>, GenMode)
     let t = templates();
     let rt = ray_table();
     let mut moves = Vec::with_capacity(64);
-    let mut mode = GenMode::AllFast;
+    let mode = GenMode::AllFast;
 
     for i in 0..board.piece_list_len[c] {
         let sq = board.piece_list[c][i] as usize;
@@ -414,72 +414,9 @@ pub enum GenMode {
     NeedsFallback,
 }
 
-/// Fast path: generate pseudo-legal moves using flat templates for pieces
-/// without hooks/range-captures/lion-mid-captures. When `NeedsFallback` is
-/// returned, `moves` is incomplete (special pieces omitted) — the caller
-/// must regenerate with `movegen::generate_pseudo_legal_moves`.
-pub fn generate_simple_moves(board: &Board) -> (Vec<crate::types::Move>, GenMode) {
-    let color = board.side_to_move;
-    let c = color as usize;
-    let t = templates();
-    let rt = ray_table();
-    let mut moves = Vec::with_capacity(384);
-    let mut mode = GenMode::AllFast;
-
-    for i in 0..board.piece_list_len[c] {
-        let sq = board.piece_list[c][i] as usize;
-        if sq == INVALID_SQ as usize { continue; }
-        let cell = board.cells[sq];
-        if cell == EMPTY_CELL { continue; }
-        let pt = cell_piece(cell);
-        crate::movegen::dedup_begin();
-        let tmpl = &t[(pt as usize).min(511)][color as usize];
-
-        if !tmpl.valid {
-            mode = GenMode::NeedsFallback;
-            continue;
-        }
-
-        let sq_r = sq_row(sq) as i32;
-        let sq_c = sq_col(sq) as i32;
-
-        for j in 0..tmpl.n_jumps as usize {
-            let (dr, dc) = tmpl.jumps[j];
-            let nr = sq_r + dr as i32;
-            let nc = sq_c + dc as i32;
-            if nr < 0 || nr >= BOARD_SIZE as i32 || nc < 0 || nc >= BOARD_SIZE as i32 { continue; }
-            let nsq = (nr as usize) * BOARD_SIZE + (nc as usize);
-            let target = board.cells[nsq];
-            if target == EMPTY_CELL {
-                push_move(&mut moves, sq as u16, nsq as u16, pt, color, EMPTY_CELL);
-            } else if cell_color(target) != color {
-                push_move(&mut moves, sq as u16, nsq as u16, pt, color, target);
-            }
-        }
-
-        for j in 0..tmpl.n_slides as usize {
-            let (dir, max_range) = tmpl.slides[j];
-            walk_ray(board, rt, sq, pt, color, dir as usize, max_range, &mut moves);
-        }
-
-        if tmpl.has_igui {
-            for d in 0..NUM_DIRS {
-                if let Some(nsq) = step_sq(sq, d, color) {
-                    let target = board.cells[nsq];
-                    if target != EMPTY_CELL && cell_color(target) != color {
-                        push_move_igui(&mut moves, sq as u16, pt, color, target);
-                    }
-                }
-            }
-        }
-    }
-
-    (moves, mode)
-}
-
 #[inline]
-fn push_move(moves: &mut Vec<crate::types::Move>, from: u16, to: u16, pt: u16,
-             color: u8, target: Cell) {
+fn push_move(moves: &mut Vec<crate::types::Move>, from: u16, to: u16, _pt: u16,
+             _color: u8, target: Cell) {
     let captured = if target != EMPTY_CELL { cell_piece(target) } else { 0 };
     let cap_color = if target != EMPTY_CELL { cell_color(target) } else { 0 };
     crate::movegen::push_unique(moves, crate::types::Move {
@@ -491,8 +428,8 @@ fn push_move(moves: &mut Vec<crate::types::Move>, from: u16, to: u16, pt: u16,
 }
 
 #[inline]
-fn push_move_igui(moves: &mut Vec<crate::types::Move>, from: u16, pt: u16,
-                  color: u8, target: Cell) {
+fn push_move_igui(moves: &mut Vec<crate::types::Move>, from: u16, _pt: u16,
+                  _color: u8, target: Cell) {
     let captured = cell_piece(target);
     let cap_color = cell_color(target);
     crate::movegen::push_unique(moves, crate::types::Move {

@@ -8,6 +8,7 @@
 //! Reference: "Piece-Square Tables" — Chess Programming Wiki. Stockfish
 //! maintains incremental PSQT scores this way.
 
+#![allow(dead_code)] // utility/debug API kept intentionally
 use crate::types::*;
 use crate::pieces;
 use crate::eval::families::family_value_fast;

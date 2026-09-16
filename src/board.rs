@@ -1,7 +1,6 @@
 use crate::types::*;
 use crate::pieces;
 use crate::bitboard::Bitboard1296;
-use crate::bitboard::U64_COUNT;
 use crate::eval::psqt;
 
 pub struct Board {

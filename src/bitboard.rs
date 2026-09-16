@@ -5,6 +5,7 @@
 //!
 //! Design inspired by the document's proposal for Taikyoku Shogi.
 
+#![allow(dead_code)] // precomputed-table / debug utilities kept intentionally
 use crate::types::*;
 
 /// Number of u64 words needed to represent 1,296 squares.

@@ -19,6 +19,7 @@
 //! (Chess Programming Wiki: "Evaluation Functions"). Stockfish uses similar
 //! precomputed PSQT (Piece-Square Tables) arrays initialized at startup.
 
+#![allow(dead_code)] // utility/debug API kept intentionally
 use crate::pieces;
 use crate::types::*;
 use crate::types::{N, S, E, W, NE, SE, SW, NW};

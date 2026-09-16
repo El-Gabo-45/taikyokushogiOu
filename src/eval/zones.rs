@@ -9,6 +9,7 @@
 //! Uses `classify_fast` (precomputed O(1) table lookup) instead of the
 //! full `classify` function with branching logic.
 
+#![allow(dead_code)] // utility/debug API kept intentionally
 use crate::board::Board;
 use crate::types::*;
 

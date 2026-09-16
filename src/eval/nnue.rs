@@ -8,9 +8,9 @@
 //! The NNUE replaces the hand-crafted evaluation with a learned one.
 //! It uses HalfKP (King + Piece) features that are incrementally updated.
 
+#![allow(dead_code)] // NNUE save/load + architecture constants are kept for the training pipeline
 use crate::board::Board;
 use crate::types::*;
-use crate::bitboard::Bitboard1296;
 use std::sync::OnceLock;
 
 // ── Constants ───────────────────────────────────────────────────

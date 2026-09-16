@@ -38,6 +38,7 @@
 //! }
 //! ```
 
+#![allow(unexpected_cfgs)] // `python` cfg is set via RUSTFLAGS by the pyo3 build
 mod types;
 mod pieces;
 mod board;
